@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/Users/hilalvildansarioglu/Desktop/SQL/carsales.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1298"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,9:mainemployees"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="brands" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="25"/><column index="2" value="66"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="cars" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths/><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="employees" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="25"/><column index="2" value="54"/><column index="3" value="136"/><column index="4" value="178"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="markalar" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths/><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="models" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="39"/><column index="2" value="48"/><column index="3" value="76"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="sales" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="39"/><column index="2" value="39"/><column index="3" value="67"/><column index="4" value="81"/><column index="5" value="136"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="sqlite_sequence" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="66"/><column index="2" value="39"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">INSERT INTO brands
+VALUES (&quot;5&quot;, &quot;Toyato&quot;);
+
+UPDATE brands
+set brandname=&quot;Opel&quot;
+WHERE id=&quot;5&quot;;
+
+DELETE 
+FROM brands
+WHERE brandname=&quot;Opel&quot;;
+
+</sql><sql name="SQL 2">CREATE INDEX fiyatagöre
+on cars(price);
+
+CREATE VIEW markalar
+as SELECT *
+FROM brands;
+
+SELECT id
+FROM markalar
+WHERE brandname=&quot;Mercedes&quot;
+
+
+</sql><sql name="SQL 3">CREATE TRIGGER firsttrigger AFTER INSERT on sales
+BEGIN
+UPDATE employees SET salary=salary+50;
+END;
+</sql><sql name="SQL 5">---araclarin alim fiyatlarinin toplami
+SELECT sum(price) as toplamfiyat
+FROM cars;
+
+--kac adet arac satin alinmis
+SELECT count(*) as toplamaracsayisi
+FROM cars;
+
+---hangi marka araclar var
+SELECT brandname
+FROM brands;
+
+--hangi marka aractan kac adet alinmis
+SELECT brands.brandname, count(*)
+FROM cars 
+JOIN brands on brands.id=cars.idbrand
+GROUP by idbrand;
+
+--hangi markanin kac modeli var
+SELECT brands.brandname, count(cars.idmodel) 
+FROM brands
+INNER JOIN cars on brands.id=cars.idbrand
+GROUP by cars.idbrand;
+
+---2.cözüm
+SELECT count(*), brands.brandname
+FROM cars JOIN brands on cars.idbrand=brands.id
+GROUP by brandname
+
+</sql><sql name="SQL 6">---ise giris tarihi girilmemis personalin listesi
+SELECT *
+FROM employees
+WHERE hiredate IS NULL;
+
+---ise giris tarihi olmayan personelin giris tarihlerini 2020-3-1 olarak güncelleyiniz
+UPDATE employees
+set hiredate=&quot;2020-03-01&quot;
+WHERE hiredate IS NULL;
+
+---tüm personele %10 zam
+UPDATE employees set salary=salary*1.1;
+
+---ortalama ücretten az alan personelin ücretini ortalamaya esitle
+UPDATE employees 
+set salary=(SELECT avg(salary) FROM employees)
+WHERE salary&lt;(SELECT avg(salary) FROM employees);
+
+---hangi personel kac adet satis yapti
+SELECT employees.name, count(sales.idemployee)
+FROM sales 
+JOIN employees on sales.idemployee=employees.id
+GROUP by sales.idemployee;
+----HAVING gruplari icinde eleme yapmak istiyorsak kullanilir
+
+----elde kalan araclarin listesi
+SELECT cars.id, cars.idbrand
+FROM cars 
+WHERE id NOT in (SELECT idcar FROM sales)
+
+
+</sql><sql name="SQL 7">---elde kalan araclairn markalari
+SELECT * 
+FROM brands
+WHERE id in (SELECT cars.idbrand FROM cars WHERE id not in (SELECT idcar FROM sales)); 
+
+---her bir arac icin alis fiyati, satis fiyati, ne kadar kar oldugunu veya ne kadar zarar oldugunu gösteriniz
+SELECT cars.price as alisiyati, sales.salesprice as satisfiyati, (sales.salesprice-cars.price) as karzarar
+FROM cars
+JOIN sales on cars.id=sales.idcar;</sql><current_tab id="4"/></tab_sql></sqlb_project>
